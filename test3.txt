@@ -1,0 +1,58 @@
+$	
+	integer x;
+	x = 100;
+	while (x != 0){
+		if (x == 100) 
+		{
+			x = x - 10;
+			put(x);
+		} 
+		else if (x == 90)
+		{
+			x = x - 10;
+			put(x);
+		} 
+		else if (x == 80)
+		{
+			x = x - 10;
+			put(x);
+		} 
+		else if (x == 70)
+		{
+			x = x - 10;
+			put(x);
+		}
+		else if (x == 60)
+		{
+			x = x - 10;
+			put(x);
+		} 
+		else if (x == 50)
+		{
+			x = x - 10;
+			put(x);
+		} 
+		else if (x == 40)
+		{
+			x = x - 10;
+			put(x);
+		} 
+		else if (x == 30)
+		{
+			x = x - 10;
+			put(x);
+		} 
+		else if (x == 20)
+		{
+			x = x - 10;
+			put(x);
+		} 
+		else if (x == 10)
+		{
+			x = x - 10;
+			put(x);
+		}
+		endif; endif; endif; endif; endif; endif; endif; endif; endif; endif;
+	}
+		
+$

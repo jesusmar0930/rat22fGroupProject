@@ -1,0 +1,12 @@
+function sub(i integer, j integer){
+	return i - j;
+}
+
+$
+	integer x, y;
+	x = 100;
+	y = 2;
+	while (x != 0){
+		x = sub(x,y);
+	}
+$

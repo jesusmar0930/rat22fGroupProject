@@ -1,0 +1,35 @@
+function add_to_value(x integer, y integer){ /*These are comments*/
+	while (x != y){
+		x = x + 3;
+		x = x - 2;
+	}
+	return x;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+$
+	integer i, j;
+	integer k, l, m;
+	j = 100;
+	k = add_to_value(i,j);
+	l = 300;
+	m = 400;
+$

@@ -1,0 +1,377 @@
+
+Lexeme - function, Line - 1:
+	 <Opt Function Definitions> ::= <Function Definitions>  |  <Empty>
+Lexeme - function, Line - 1:
+	 <Function Definitions>  ::= <Function>  <Function Definitions’>
+Lexeme - x, Line - 1:
+	 <Opt Parameter List> ::=  <Parameter List>  |   <Empty>
+Lexeme - x, Line - 1:
+	 <Parameter List>  ::=  <Parameter><Parameter List’>
+Lexeme - x, Line - 1:
+	 <Parameter> ::=  <IDs >  <Qualifier>
+Lexeme - x, Line - 1:
+	 <IDs> ::= 	<Identifier><IDs’>
+Lexeme - integer, Line - 1:
+	 <IDs’> ::= <Empty>
+Lexeme - integer, Line - 1:
+	 <Empty>   ::= <Empty>
+Lexeme - integer, Line - 1:
+	 <Qualifier> ::= integer
+Lexeme - ,, Line - 1:
+	 <Parameter List’> ::= <Parameter List>
+Lexeme - y, Line - 1:
+	 <Parameter List>  ::=  <Parameter><Parameter List’>
+Lexeme - y, Line - 1:
+	 <Parameter> ::=  <IDs >  <Qualifier>
+Lexeme - y, Line - 1:
+	 <IDs> ::= 	<Identifier><IDs’>
+Lexeme - integer, Line - 1:
+	 <IDs’> ::= <Empty>
+Lexeme - integer, Line - 1:
+	 <Empty>   ::= <Empty>
+Lexeme - integer, Line - 1:
+	 <Qualifier> ::= integer
+Lexeme - ), Line - 1:
+	 <Parameter List’> ::= <Empty>
+Lexeme - ), Line - 1:
+	 <Empty>   ::= <Empty>
+Lexeme - while, Line - 2:
+	 <Statement List> ::=   <Statement><Statement List’>
+Lexeme - while, Line - 2:
+	 <Statement> ::=   <While> 
+Lexeme - (, Line - 2:
+	 <While> ::=  while ( <Condition>  )  <Statement> 
+Lexeme - x, Line - 2:
+	 <Condition> ::= 	<Expression>  <Relop>   <Expression>
+Lexeme - x, Line - 2:
+	 <Expression>  ::= <Term><Expression’>
+Lexeme - x, Line - 2:
+	 <Term>  ::= <Factor><Term’>
+Lexeme - x, Line - 2:
+	 <Factor> ::= <Primary>
+Lexeme - x, Line - 2:
+	 <Primary> ::=  <Identifier> <Primary’>
+Lexeme - !=, Line - 2:
+	 <Primary’> ::= <Empty>
+Lexeme - !=, Line - 2:
+	 <Empty>   ::= <Empty>
+Lexeme - !=, Line - 2:
+	 <Term’> ::= <Empty>
+Lexeme - !=, Line - 2:
+	 <Empty>   ::= <Empty>
+Lexeme - !=, Line - 2:
+	 <Expression’> ::= <Empty>
+Lexeme - !=, Line - 2:
+	 <Empty>   ::= <Empty>
+Lexeme - !=, Line - 2:
+	 <Relop> ::=    	==   |   !=	|   > 	|   <	|  <=   |	=>
+Lexeme - y, Line - 2:
+	 <Expression>  ::= <Term><Expression’>
+Lexeme - y, Line - 2:
+	 <Term>  ::= <Factor><Term’>
+Lexeme - y, Line - 2:
+	 <Factor> ::= <Primary>
+Lexeme - y, Line - 2:
+	 <Primary> ::=  <Identifier> <Primary’>
+Lexeme - ), Line - 2:
+	 <Primary’> ::= <Empty>
+Lexeme - ), Line - 2:
+	 <Empty>   ::= <Empty>
+Lexeme - ), Line - 2:
+	 <Term’> ::= <Empty>
+Lexeme - ), Line - 2:
+	 <Empty>   ::= <Empty>
+Lexeme - ), Line - 2:
+	 <Expression’> ::= <Empty>
+Lexeme - ), Line - 2:
+	 <Empty>   ::= <Empty>
+Lexeme - {, Line - 2:
+	 <Statement> ::=   <Compound> 
+Lexeme - x, Line - 3:
+	 <Statement List> ::=   <Statement><Statement List’>
+Lexeme - x, Line - 3:
+	 <Statement> ::=   <Assign> 
+Lexeme - x, Line - 3:
+	 <Expression>  ::= <Term><Expression’>
+Lexeme - x, Line - 3:
+	 <Term>  ::= <Factor><Term’>
+Lexeme - x, Line - 3:
+	 <Factor> ::= <Primary>
+Lexeme - x, Line - 3:
+	 <Primary> ::=  <Identifier> <Primary’>
+Lexeme - +, Line - 3:
+	 <Primary’> ::= <Empty>
+Lexeme - +, Line - 3:
+	 <Empty>   ::= <Empty>
+Lexeme - +, Line - 3:
+	 <Term’> ::= <Empty>
+Lexeme - +, Line - 3:
+	 <Empty>   ::= <Empty>
+Lexeme - +, Line - 3:
+	 <Expression’> ::= +<Term><Expression’>
+Lexeme - 3, Line - 3:
+	 <Term>  ::= <Factor><Term’>
+Lexeme - 3, Line - 3:
+	 <Factor> ::= <Primary>
+Lexeme - 3, Line - 3:
+	 <Primary> ::=  <Integer>
+Lexeme - ;, Line - 3:
+	 <Term’> ::= <Empty>
+Lexeme - ;, Line - 3:
+	 <Empty>   ::= <Empty>
+Lexeme - ;, Line - 3:
+	 <Expression’> ::= <Empty>
+Lexeme - ;, Line - 3:
+	 <Empty>   ::= <Empty>
+Lexeme - ;, Line - 3:
+	 <Assign> ::= <Identifier> = <Expression> ;
+Lexeme - x, Line - 4:
+	 <Statement List’> ::=  <Statement List>
+Lexeme - x, Line - 4:
+	 <Statement> ::=   <Assign> 
+Lexeme - x, Line - 4:
+	 <Expression>  ::= <Term><Expression’>
+Lexeme - x, Line - 4:
+	 <Term>  ::= <Factor><Term’>
+Lexeme - x, Line - 4:
+	 <Factor> ::= <Primary>
+Lexeme - x, Line - 4:
+	 <Primary> ::=  <Identifier> <Primary’>
+Lexeme - -, Line - 4:
+	 <Primary’> ::= <Empty>
+Lexeme - -, Line - 4:
+	 <Empty>   ::= <Empty>
+Lexeme - -, Line - 4:
+	 <Term’> ::= <Empty>
+Lexeme - -, Line - 4:
+	 <Empty>   ::= <Empty>
+Lexeme - -, Line - 4:
+	 <Expression’> ::= -<Term><Expression’>
+Lexeme - 2, Line - 4:
+	 <Term>  ::= <Factor><Term’>
+Lexeme - 2, Line - 4:
+	 <Factor> ::= <Primary>
+Lexeme - 2, Line - 4:
+	 <Primary> ::=  <Integer>
+Lexeme - ;, Line - 4:
+	 <Term’> ::= <Empty>
+Lexeme - ;, Line - 4:
+	 <Empty>   ::= <Empty>
+Lexeme - ;, Line - 4:
+	 <Expression’> ::= <Empty>
+Lexeme - ;, Line - 4:
+	 <Empty>   ::= <Empty>
+Lexeme - ;, Line - 4:
+	 <Assign> ::= <Identifier> = <Expression> ;
+Lexeme - }, Line - 5:
+	 <Statement List’> ::=  <Empty>
+Lexeme - }, Line - 5:
+	 <Empty>   ::= <Empty>
+Lexeme - }, Line - 5:
+	 <Statement List’> ::=  <Empty>
+Lexeme - }, Line - 5:
+	 <Empty>   ::= <Empty>
+Lexeme - }, Line - 5:
+	 <Compound> ::=   {  <Statement List>  }
+Lexeme - return, Line - 6:
+	 <While> ::=  while ( <Condition>  )  <Statement> 
+Lexeme - return, Line - 6:
+	 <Statement List’> ::=  <Statement List>
+Lexeme - return, Line - 6:
+	 <Statement> ::=   <Return> 
+Lexeme - x, Line - 6:
+	 <Return> ::=  return<Return’>
+Lexeme - x, Line - 6:
+	 <Return’> ::= <Expression>
+Lexeme - x, Line - 6:
+	 <Expression>  ::= <Term><Expression’>
+Lexeme - x, Line - 6:
+	 <Term>  ::= <Factor><Term’>
+Lexeme - x, Line - 6:
+	 <Factor> ::= <Primary>
+Lexeme - x, Line - 6:
+	 <Primary> ::=  <Identifier> <Primary’>
+Lexeme - ;, Line - 6:
+	 <Primary’> ::= <Empty>
+Lexeme - ;, Line - 6:
+	 <Empty>   ::= <Empty>
+Lexeme - ;, Line - 6:
+	 <Term’> ::= <Empty>
+Lexeme - ;, Line - 6:
+	 <Empty>   ::= <Empty>
+Lexeme - ;, Line - 6:
+	 <Expression’> ::= <Empty>
+Lexeme - ;, Line - 6:
+	 <Empty>   ::= <Empty>
+Lexeme - ;, Line - 6:
+	 <Return’> ::= <Empty>
+Lexeme - }, Line - 7:
+	 <Empty>   ::= <Empty>
+Lexeme - }, Line - 7:
+	 <Body>  ::=  {  < Statement List>  }
+Lexeme - $, Line - 28:
+	 <Function> ::= function  <Identifier>   ( <Opt Parameter List> )  <Opt Declaration List>  <Body>
+Lexeme - $, Line - 28:
+	 <Function Definitions’> ::= <Empty>
+Lexeme - $, Line - 28:
+	 <Empty>   ::= <Empty>
+Lexeme - $, Line - 28:
+	 <Rat22F>  ::=   <Opt Function Definitions>   $  <Opt Declaration List>  <Statement List>  $
+Lexeme - $, Line - 28:
+	 <Rat22F>  ::=   <Opt Function Definitions>   $  <Opt Declaration List>  <Statement List>  $
+Lexeme - integer, Line - 29:
+	 <Opt Function Definitions> ::= <Function Definitions>
+Lexeme - integer, Line - 29:
+	 <Declaration List> ::= <Declaration> ; <Declaration List’>
+Lexeme - integer, Line - 29:
+	 <Declaration> ::=   <Qualifier > <IDs> 
+Lexeme - integer, Line - 29:
+	 <Qualifier> ::= integer
+Lexeme - i, Line - 29:
+	 <IDs> ::= 	<Identifier><IDs’>
+Lexeme - ,, Line - 29:
+	 <IDs’> ::= ,<IDs>
+Lexeme - j, Line - 29:
+	 <IDs> ::= 	<Identifier><IDs’>
+Lexeme - ;, Line - 29:
+	 <IDs’> ::= <Empty>
+Lexeme - ;, Line - 29:
+	 <Empty>   ::= <Empty>
+Lexeme - integer, Line - 30:
+	 <Declaration List’> ::= <Declaration List>
+Lexeme - integer, Line - 30:
+	 <Declaration List> ::= <Declaration> ; <Declaration List’>
+Lexeme - integer, Line - 30:
+	 <Declaration> ::=   <Qualifier > <IDs> 
+Lexeme - integer, Line - 30:
+	 <Qualifier> ::= integer
+Lexeme - k, Line - 30:
+	 <IDs> ::= 	<Identifier><IDs’>
+Lexeme - ,, Line - 30:
+	 <IDs’> ::= ,<IDs>
+Lexeme - l, Line - 30:
+	 <IDs> ::= 	<Identifier><IDs’>
+Lexeme - ,, Line - 30:
+	 <IDs’> ::= ,<IDs>
+Lexeme - m, Line - 30:
+	 <IDs> ::= 	<Identifier><IDs’>
+Lexeme - ;, Line - 30:
+	 <IDs’> ::= <Empty>
+Lexeme - ;, Line - 30:
+	 <Empty>   ::= <Empty>
+Lexeme - j, Line - 31:
+	 <Declaration List’> ::= <Empty>
+Lexeme - j, Line - 31:
+	 <Empty>   ::= <Empty>
+Lexeme - j, Line - 31:
+	 <Statement List> ::=   <Statement><Statement List’>
+Lexeme - j, Line - 31:
+	 <Statement> ::=   <Assign> 
+Lexeme - 100, Line - 31:
+	 <Expression>  ::= <Term><Expression’>
+Lexeme - 100, Line - 31:
+	 <Term>  ::= <Factor><Term’>
+Lexeme - 100, Line - 31:
+	 <Factor> ::= <Primary>
+Lexeme - 100, Line - 31:
+	 <Primary> ::=  <Integer>
+Lexeme - ;, Line - 31:
+	 <Term’> ::= <Empty>
+Lexeme - ;, Line - 31:
+	 <Empty>   ::= <Empty>
+Lexeme - ;, Line - 31:
+	 <Expression’> ::= <Empty>
+Lexeme - ;, Line - 31:
+	 <Empty>   ::= <Empty>
+Lexeme - ;, Line - 31:
+	 <Assign> ::= <Identifier> = <Expression> ;
+Lexeme - k, Line - 32:
+	 <Statement List’> ::=  <Statement List>
+Lexeme - k, Line - 32:
+	 <Statement> ::=   <Assign> 
+Lexeme - add_to_value, Line - 32:
+	 <Expression>  ::= <Term><Expression’>
+Lexeme - add_to_value, Line - 32:
+	 <Term>  ::= <Factor><Term’>
+Lexeme - add_to_value, Line - 32:
+	 <Factor> ::= <Primary>
+Lexeme - add_to_value, Line - 32:
+	 <Primary> ::=  <Identifier> <Primary’>
+Lexeme - (, Line - 32:
+	 <Primary’> ::= (<IDs>)
+Lexeme - i, Line - 32:
+	 <IDs> ::= 	<Identifier><IDs’>
+Lexeme - ,, Line - 32:
+	 <IDs’> ::= ,<IDs>
+Lexeme - j, Line - 32:
+	 <IDs> ::= 	<Identifier><IDs’>
+Lexeme - ), Line - 32:
+	 <IDs’> ::= <Empty>
+Lexeme - ), Line - 32:
+	 <Empty>   ::= <Empty>
+Lexeme - ;, Line - 32:
+	 <Term’> ::= <Empty>
+Lexeme - ;, Line - 32:
+	 <Empty>   ::= <Empty>
+Lexeme - ;, Line - 32:
+	 <Expression’> ::= <Empty>
+Lexeme - ;, Line - 32:
+	 <Empty>   ::= <Empty>
+Lexeme - ;, Line - 32:
+	 <Assign> ::= <Identifier> = <Expression> ;
+Lexeme - l, Line - 33:
+	 <Statement List’> ::=  <Statement List>
+Lexeme - l, Line - 33:
+	 <Statement> ::=   <Assign> 
+Lexeme - 300, Line - 33:
+	 <Expression>  ::= <Term><Expression’>
+Lexeme - 300, Line - 33:
+	 <Term>  ::= <Factor><Term’>
+Lexeme - 300, Line - 33:
+	 <Factor> ::= <Primary>
+Lexeme - 300, Line - 33:
+	 <Primary> ::=  <Integer>
+Lexeme - ;, Line - 33:
+	 <Term’> ::= <Empty>
+Lexeme - ;, Line - 33:
+	 <Empty>   ::= <Empty>
+Lexeme - ;, Line - 33:
+	 <Expression’> ::= <Empty>
+Lexeme - ;, Line - 33:
+	 <Empty>   ::= <Empty>
+Lexeme - ;, Line - 33:
+	 <Assign> ::= <Identifier> = <Expression> ;
+Lexeme - m, Line - 34:
+	 <Statement List’> ::=  <Statement List>
+Lexeme - m, Line - 34:
+	 <Statement> ::=   <Assign> 
+Lexeme - 400, Line - 34:
+	 <Expression>  ::= <Term><Expression’>
+Lexeme - 400, Line - 34:
+	 <Term>  ::= <Factor><Term’>
+Lexeme - 400, Line - 34:
+	 <Factor> ::= <Primary>
+Lexeme - 400, Line - 34:
+	 <Primary> ::=  <Integer>
+Lexeme - ;, Line - 34:
+	 <Term’> ::= <Empty>
+Lexeme - ;, Line - 34:
+	 <Empty>   ::= <Empty>
+Lexeme - ;, Line - 34:
+	 <Expression’> ::= <Empty>
+Lexeme - ;, Line - 34:
+	 <Empty>   ::= <Empty>
+Lexeme - ;, Line - 34:
+	 <Assign> ::= <Identifier> = <Expression> ;
+Lexeme - $, Line - 35:
+	 <Statement List’> ::=  <Empty>
+Lexeme - $, Line - 35:
+	 <Empty>   ::= <Empty>
+Lexeme - $, Line - 35:
+	 <Statement List’> ::=  <Empty>
+Lexeme - $, Line - 35:
+	 <Empty>   ::= <Empty>
+Lexeme - $, Line - 35:
+	 <Empty>   ::= <Empty>
+Lexeme - $, Line - 35:
+	 <Rat22F>  ::=   <Opt Function Definitions>   $  <Opt Declaration List>  <Statement List>  $
