@@ -26,7 +26,14 @@ global queuedText
 global lineCounter
 global legalTokens
 global outFile
-
+global instructionTable
+global symbolTable
+global jumpStack
+global memoryCounter
+global addressCounter
+global qualifier
+global relatop
+global getStack
 
 symbol = [arithOps, assignOps, comparOps, logOps, seperatorOps]
 
@@ -103,7 +110,7 @@ transitional_table = {
         CT_VALUE: STATE_OPS_SEPS,
         CT_ILLEGAL: STATE_ERROR,
     },
-    STATE_ERROR: {
+    STATE_ERROR: { 
         CT_ALPHABET: STATE_ERROR,
         CT_DIGIT: STATE_ERROR,
         CT_DECIMAL: STATE_ERROR,
@@ -243,80 +250,103 @@ def lexer():
             return None
     return curState, token
 
+def get_address(identifier):
+    global symbolTable
+    global qualifier
+    global memoryCounter
+    if identifier[1] not in symbolTable['ident']:
+        symbolTable['ident'].append(identifier[1])
+        symbolTable['mem'].append(memoryCounter)
+        symbolTable['type'].append(qualifier)
+        memoryCounter += 1
+        return memoryCounter - 1
+    return symbolTable['mem'][symbolTable['ident'].index(identifier[1])]
+
+def gen_inst(op, oprnd):
+    global instructionTable
+    global addressCounter
+    instructionTable.append([addressCounter, op, oprnd])
+    addressCounter += 1
+
+def backPatch(jumpAddr):
+    global jumpStack
+    global instructionTable
+    address = jumpStack[-1]
+    jumpStack = jumpStack[:-1]
+    instructionTable[address - 1][2] = jumpAddr
 
 def rat22f():
     global legalTokens
-    if legalTokens[0][1] == "function":
-        optFuncDefs()
-        outFile.write(f"\nLexeme - {legalTokens[0][1]}, Line - {legalTokens[0][2]}:\n\t <Rat22F>  ::=   <Opt Function Definitions>   $  <Opt Declaration List>  <Statement List>  $")
+##    if legalTokens[0][1] == "function":
+##        optFuncDefs()
+##        print(f"\nLexeme - {legalTokens[0][1]}, Line - {legalTokens[0][2]}:\n\t <Rat22F>  ::=   <Opt Function Definitions>   $  <Opt Declaration List>  <Statement List>  $")
     if legalTokens[0][1] == "$":
-        outFile.write(f"\nLexeme - {legalTokens[0][1]}, Line - {legalTokens[0][2]}:\n\t <Rat22F>  ::=   <Opt Function Definitions>   $  <Opt Declaration List>  <Statement List>  $")
         legalTokens = legalTokens[1:]
-        optDecList()
-        stateList()
+        while legalTokens[0][1] != "$":
+            if legalTokens[0][1] == "integer" or legalTokens[0][1] == "boolean":
+                optDecList()
+            stateList()
         if legalTokens[0][1] == "$":
             empty()
-            outFile.write(f"\nLexeme - {legalTokens[0][1]}, Line - {legalTokens[0][2]}:\n\t <Rat22F>  ::=   <Opt Function Definitions>   $  <Opt Declaration List>  <Statement List>  $")
         else:
-            outFile.write(f"\nGot: Lexeme - {legalTokens[0][1]}, Line - {legalTokens[0][2]}:\n\t, Expected $")
+            raise Exception(f"\nGot: Lexeme - {legalTokens[0][1]}, Line - {legalTokens[0][2]}:\n\t, Expected $ #1")
     else:
-        outFile.write(f"\nGot: Lexeme - {legalTokens[0][1]}, Line - {legalTokens[0][2]}:\n\t, Expected $")
+        raise Exception(f"\nGot: Lexeme - {legalTokens[0][1]}, Line - {legalTokens[0][2]}:\n\t, Expected $ #2")
 
 
-def optFuncDefs():
-    global legalTokens
-    outFile.write(f"\nLexeme - {legalTokens[0][1]}, Line - {legalTokens[0][2]}:\n\t <Opt Function Definitions> ::= <Function Definitions>  |  <Empty>")
-    funcDefs()
-
-
-def funcDefs():
-    global legalTokens
-    outFile.write(f"\nLexeme - {legalTokens[0][1]}, Line - {legalTokens[0][2]}:\n\t <Function Definitions>  ::= <Function>  <Function Definitions’>")
-    func()
-    funcDefsPrime()
-
-
-def funcDefsPrime():
-    global legalTokens
-    if legalTokens[0][1] == "function":
-        outFile.write(f"\nLexeme - {legalTokens[0][1]}, Line - {legalTokens[0][2]}:\n\t <Function Definitions’> ::= <Functions Definitions>")
-        funcDefs()
-    else:
-        outFile.write(f"\nLexeme - {legalTokens[0][1]}, Line - {legalTokens[0][2]}:\n\t <Function Definitions’> ::= <Empty>")
-        empty()
-
-def func():
-    global legalTokens
-    if legalTokens[0][1] == "function":
-        legalTokens = legalTokens[1:]
-    else:
-        return empty()
-    if legalTokens[0][0] == STATE_IDENTIFIER:
-        legalTokens = legalTokens[1:]
-        if legalTokens[0][1] == "(":
-            legalTokens = legalTokens[1:]
-            if legalTokens[0][1] != ")":
-                outFile.write(f"\nLexeme - {legalTokens[0][1]}, Line - {legalTokens[0][2]}:\n\t <Opt Parameter List> ::=  <Parameter List>  |   <Empty>")
-                paramList()
-            if legalTokens[0][1] == ")":
-                legalTokens = legalTokens[1:]
-                if legalTokens[0][1] != "{":
-                    decList()
-                if legalTokens[0][1] == "{":
-                    body()
-                    outFile.write(f"\nLexeme - {legalTokens[0][1]}, Line - {legalTokens[0][2]}:\n\t <Function> ::= function  <Identifier>   ( <Opt Parameter List> )  <Opt Declaration List>  <Body>")
-                else:
-                    outFile.write(f"\nGot: Lexeme - {legalTokens[0][1]}, Line - {legalTokens[0][2]}:\n\t, Expected {'{'}")
-            else:
-                outFile.write(f"\nGot: Lexeme - {legalTokens[0][1]}, Line - {legalTokens[0][2]}:\n\t, Expected )")
-        else:
-            outFile.write(f"\nGot: Lexeme - {legalTokens[0][1]}, Line - {legalTokens[0][2]}:\n\t, Expected (")
-    else:
-        outFile.write(f"\nGot: Lexeme - {legalTokens[0][1]}, Line - {legalTokens[0][2]}:\n\t, Expected <Identifier>")
+##def optFuncDefs():
+##    global legalTokens
+##    print(f"\nLexeme - {legalTokens[0][1]}, Line - {legalTokens[0][2]}:\n\t <Opt Function Definitions> ::= <Function Definitions>  |  <Empty>")
+##    funcDefs()
+##
+##
+##def funcDefs():
+##    global legalTokens
+##    print(f"\nLexeme - {legalTokens[0][1]}, Line - {legalTokens[0][2]}:\n\t <Function Definitions>  ::= <Function>  <Function Definitions’>")
+##    func()
+##    funcDefsPrime()
+##
+##
+##def funcDefsPrime():
+##    global legalTokens
+##    if legalTokens[0][1] == "function":
+##        print(f"\nLexeme - {legalTokens[0][1]}, Line - {legalTokens[0][2]}:\n\t <Function Definitions’> ::= <Functions Definitions>")
+##        funcDefs()
+##    else:
+##        print(f"\nLexeme - {legalTokens[0][1]}, Line - {legalTokens[0][2]}:\n\t <Function Definitions’> ::= <Empty>")
+##        empty()
+##
+##def func():
+##    global legalTokens
+##    if legalTokens[0][1] == "function":
+##        legalTokens = legalTokens[1:]
+##    else:
+##        return empty()
+##    if legalTokens[0][0] == STATE_IDENTIFIER:
+##        legalTokens = legalTokens[1:]
+##        if legalTokens[0][1] == "(":
+##            legalTokens = legalTokens[1:]
+##            if legalTokens[0][1] != ")":
+##                print(f"\nLexeme - {legalTokens[0][1]}, Line - {legalTokens[0][2]}:\n\t <Opt Parameter List> ::=  <Parameter List>  |   <Empty>")
+##                paramList()
+##            if legalTokens[0][1] == ")":
+##                legalTokens = legalTokens[1:]
+##                if legalTokens[0][1] != "{":
+##                    decList()
+##                if legalTokens[0][1] == "{":
+##                    body()
+##                    print(f"\nLexeme - {legalTokens[0][1]}, Line - {legalTokens[0][2]}:\n\t <Function> ::= function  <Identifier>   ( <Opt Parameter List> )  <Opt Declaration List>  <Body>")
+##                else:
+##                    raise Exception(f"\nGot: Lexeme - {legalTokens[0][1]}, Line - {legalTokens[0][2]}:\n\t, Expected {'{'}")
+##            else:
+##                raise Exception(f"\nGot: Lexeme - {legalTokens[0][1]}, Line - {legalTokens[0][2]}:\n\t, Expected )")
+##        else:
+##            raise Exception(f"\nGot: Lexeme - {legalTokens[0][1]}, Line - {legalTokens[0][2]}:\n\t, Expected (")
+##    else:
+##        raise Exception(f"\nGot: Lexeme - {legalTokens[0][1]}, Line - {legalTokens[0][2]}:\n\t, Expected <Identifier>")
 
 def paramList():
     global legalTokens
-    outFile.write(f"\nLexeme - {legalTokens[0][1]}, Line - {legalTokens[0][2]}:\n\t <Parameter List>  ::=  <Parameter><Parameter List’>")
     param()
     paramListPrime()
 
@@ -324,34 +354,29 @@ def paramList():
 def paramListPrime():
     global legalTokens
     if legalTokens[0][1] == ",":
-        outFile.write(f"\nLexeme - {legalTokens[0][1]}, Line - {legalTokens[0][2]}:\n\t <Parameter List’> ::= <Parameter List>")
         legalTokens = legalTokens[1:]
         paramList()
     else:
-        outFile.write(f"\nLexeme - {legalTokens[0][1]}, Line - {legalTokens[0][2]}:\n\t <Parameter List’> ::= <Empty>")
         empty()
 
 
 def param():
     global legalTokens
-    outFile.write(f"\nLexeme - {legalTokens[0][1]}, Line - {legalTokens[0][2]}:\n\t <Parameter> ::=  <IDs >  <Qualifier>")
     ids()
     qual()
 
 
 def qual():
     global legalTokens
+    global qualifier
     if legalTokens[0][1] == "boolean":
-        outFile.write(f"\nLexeme - {legalTokens[0][1]}, Line - {legalTokens[0][2]}:\n\t <Qualifier> ::= boolean")
+        qualifier = legalTokens[0][1]
         legalTokens = legalTokens[1:]
     elif legalTokens[0][1] == "integer":
-        outFile.write(f"\nLexeme - {legalTokens[0][1]}, Line - {legalTokens[0][2]}:\n\t <Qualifier> ::= integer")
-        legalTokens = legalTokens[1:]
-    elif legalTokens[0][1] == "real":
-        outFile.write(f"\nLexeme - {legalTokens[0][1]}, Line - {legalTokens[0][2]}:\n\t <Qualifier> ::= real")
+        qualifier = legalTokens[0][1]
         legalTokens = legalTokens[1:]
     else:
-        outFile.write(f"\nGot: Lexeme - {legalTokens[0][1]}, Line - {legalTokens[0][2]}:\n\t, Expected <Qualifier>")
+        raise Exception(f"\nGot: Lexeme - {legalTokens[0][1]}, Line - {legalTokens[0][2]}:\n\t, Expected <Qualifier>")
 
 
 def body():
@@ -360,30 +385,25 @@ def body():
         legalTokens = legalTokens[1:]
         stateList()
         if legalTokens[0][1] == "}":
-            outFile.write(f"\nLexeme - {legalTokens[0][1]}, Line - {legalTokens[0][2]}:\n\t <Body>  ::=  {'{'}  < Statement List>  {'}'}")
             legalTokens = legalTokens[1:]
-        else:
-            outFile.write(f"\nGot: Lexeme - {legalTokens[0][1]}, Line - {legalTokens[0][2]}:\n\t, Expected {'}'}")
     else:
-        outFile.write(f"\nGot: Lexeme - {legalTokens[0][1]}, Line - {legalTokens[0][2]}:\n\t, Expected {'{'}")
+        raise Exception(f"\nGot: Lexeme - {legalTokens[0][1]}, Line - {legalTokens[0][2]}:\n\t, Expected {'{'}")
 
 
 def optDecList():
     global legalTokens
-    outFile.write(f"\nLexeme - {legalTokens[0][1]}, Line - {legalTokens[0][2]}:\n\t <Opt Function Definitions> ::= <Function Definitions>")
     decList()
     
 
 
 def decList():
     global legalTokens
-    outFile.write(f"\nLexeme - {legalTokens[0][1]}, Line - {legalTokens[0][2]}:\n\t <Declaration List> ::= <Declaration> ; <Declaration List’>")
     dec()
     if legalTokens[0][1] == ";":
         legalTokens = legalTokens[1:]
         decListPrime()
     else:
-        outFile.write(f"\nGot: Lexeme - {legalTokens[0][1]}, Line - {legalTokens[0][2]}:\n\t, Expected ;")
+        raise Exception(f"\nGot: Lexeme - {legalTokens[0][1]}, Line - {legalTokens[0][2]}:\n\t, Expected ;")
 
 
 def decListPrime():
@@ -391,46 +411,40 @@ def decListPrime():
     if (
         legalTokens[0][1] == "integer"
         or legalTokens[0][1] == "boolean"
-        or legalTokens[0][1] == "real"
     ):
-        outFile.write(f"\nLexeme - {legalTokens[0][1]}, Line - {legalTokens[0][2]}:\n\t <Declaration List’> ::= <Declaration List>")
         decList()
     else:
-        outFile.write(f"\nLexeme - {legalTokens[0][1]}, Line - {legalTokens[0][2]}:\n\t <Declaration List’> ::= <Empty>")
         empty()
 
 
 def dec():
     global legalTokens
-    outFile.write(f"\nLexeme - {legalTokens[0][1]}, Line - {legalTokens[0][2]}:\n\t <Declaration> ::=   <Qualifier > <IDs> ")
-    qual()
-    ids()
+    qualif = qual()
+    identif = ids()
 
 
 def ids():
+    global getStack
     global legalTokens
     if legalTokens[0][0] == STATE_IDENTIFIER:
-        outFile.write(f"\nLexeme - {legalTokens[0][1]}, Line - {legalTokens[0][2]}:\n\t <IDs> ::= 	<Identifier><IDs’>")
+        getStack.append(get_address(legalTokens[0]))
         legalTokens = legalTokens[1:]
         idsPrime()
     else:
-        outFile.write(f"\nGot: Lexeme - {legalTokens[0][1]}, Line - {legalTokens[0][2]}:\n\t, Expected <Identifier>")
+        raise Exception(f"\nGot: Lexeme - {legalTokens[0][1]}, Line - {legalTokens[0][2]}:\n\t, Expected <Identifier>")
 
 
 def idsPrime():
     global legalTokens
     if legalTokens[0][1] == ",":
-        outFile.write(f"\nLexeme - {legalTokens[0][1]}, Line - {legalTokens[0][2]}:\n\t <IDs’> ::= ,<IDs>")
         legalTokens = legalTokens[1:]
         ids()
     else:
-        outFile.write(f"\nLexeme - {legalTokens[0][1]}, Line - {legalTokens[0][2]}:\n\t <IDs’> ::= <Empty>")
         empty()
 
 
 def stateList():
     global legalTokens
-    outFile.write(f"\nLexeme - {legalTokens[0][1]}, Line - {legalTokens[0][2]}:\n\t <Statement List> ::=   <Statement><Statement List’>")
     statement()
     stateListPrime()
 
@@ -446,71 +460,62 @@ def stateListPrime():
         or legalTokens[0][1] == "get"
         or legalTokens[0][1] == "while"
     ):
-        outFile.write(f"\nLexeme - {legalTokens[0][1]}, Line - {legalTokens[0][2]}:\n\t <Statement List’> ::=  <Statement List>")
         statement()
     else:
-        outFile.write(f"\nLexeme - {legalTokens[0][1]}, Line - {legalTokens[0][2]}:\n\t <Statement List’> ::=  <Empty>")
         empty()
 
 
 def statement():
     global legalTokens
     if legalTokens[0][1] == "{":
-        outFile.write(f"\nLexeme - {legalTokens[0][1]}, Line - {legalTokens[0][2]}:\n\t <Statement> ::=   <Compound> ")
         comp()
     elif legalTokens[0][0] == STATE_IDENTIFIER:
-        outFile.write(f"\nLexeme - {legalTokens[0][1]}, Line - {legalTokens[0][2]}:\n\t <Statement> ::=   <Assign> ")
         assign()
     elif legalTokens[0][1] == "if":
-        outFile.write(f"\nLexeme - {legalTokens[0][1]}, Line - {legalTokens[0][2]}:\n\t <Statement> ::=   <If> ")
         implication()
     elif legalTokens[0][1] == "return":
-        outFile.write(f"\nLexeme - {legalTokens[0][1]}, Line - {legalTokens[0][2]}:\n\t <Statement> ::=   <Return> ")
         ret()
     elif legalTokens[0][1] == "put":
-        outFile.write(f"\nLexeme - {legalTokens[0][1]}, Line - {legalTokens[0][2]}:\n\t <Statement> ::=   <Print> ")
         printPut()
     elif legalTokens[0][1] == "get":
-        outFile.write(f"\nLexeme - {legalTokens[0][1]}, Line - {legalTokens[0][2]}:\n\t <Statement> ::=   <Scan> ")
         scanGet()
     elif legalTokens[0][1] == "while":
-        outFile.write(f"\nLexeme - {legalTokens[0][1]}, Line - {legalTokens[0][2]}:\n\t <Statement> ::=   <While> ")
         condLoop()
     else:
-        outFile.write(f"\nGot: Lexeme - {legalTokens[0][1]}, Line - {legalTokens[0][2]}:\n\t, Expected <Statement>")
+        raise Exception(f"\nGot: Lexeme - {legalTokens[0][1]}, Line - {legalTokens[0][2]}:\n\t, Expected <Statement>")
 
 
 def comp():
     global legalTokens
     if legalTokens[0][1] == "{":
         legalTokens = legalTokens[1:]
-        stateList()
+        while legalTokens[0][1] != "}":
+            stateList()
         if legalTokens[0][1] == "}":
-            outFile.write(f"\nLexeme - {legalTokens[0][1]}, Line - {legalTokens[0][2]}:\n\t <Compound> ::=   {'{'}  <Statement List>  {'}'}")
             legalTokens = legalTokens[1:]
         else:
-            outFile.write(f"\nGot: Lexeme - {legalTokens[0][1]}, Line - {legalTokens[0][2]}:\n\t, Expected {'}'}")
+            raise Exception(f"\nGot: Lexeme - {legalTokens[0][1]}, Line - {legalTokens[0][2]}:\n\t, Expected {'}'}")
     else:
-        outFile.write(f"\nGot: Lexeme - {legalTokens[0][1]}, Line - {legalTokens[0][2]}:\n\t, Expected {'{'}")
+        raise Exception(f"\nGot: Lexeme - {legalTokens[0][1]}, Line - {legalTokens[0][2]}:\n\t, Expected {'{'}")
 
 
 def assign():
     global legalTokens
     if legalTokens[0][0] == STATE_IDENTIFIER:
+        save = legalTokens[0]
         legalTokens = legalTokens[1:]
         if legalTokens[0][1] == "=":
             legalTokens = legalTokens[1:]
             exp()
+            gen_inst("POPM", get_address(save))
             if legalTokens[0][1] == ";":
-                outFile.write(f"\nLexeme - {legalTokens[0][1]}, Line - {legalTokens[0][2]}:\n\t <Assign> ::= <Identifier> = <Expression> ;")
                 legalTokens = legalTokens[1:]
-                stateListPrime()
             else:
-                outFile.write(f"\nGot: Lexeme - {legalTokens[0][1]}, Line - {legalTokens[0][2]}:\n\t, Expected ;")
+                raise Exception(f"\nGot: Lexeme - {legalTokens[0][1]}, Line - {legalTokens[0][2]}:\n\t, Expected ;")
         else:
-            outFile.write(f"\nGot: Lexeme - {legalTokens[0][1]}, Line - {legalTokens[0][2]}:\n\t, Expected =")
+            raise Exception(f"\nGot: Lexeme - {legalTokens[0][1]}, Line - {legalTokens[0][2]}:\n\t, Expected =")
     else:
-        outFile.write(f"\nGot: Lexeme - {legalTokens[0][1]}, Line - {legalTokens[0][2]}:\n\t, Expected <Identifier>")
+        raise Exception(f"\nGot: Lexeme - {legalTokens[0][1]}, Line - {legalTokens[0][2]}:\n\t, Expected <Identifier>")
 			
 
 
@@ -524,35 +529,36 @@ def implication():
             if legalTokens[0][1] == ")":
                 legalTokens = legalTokens[1:]
                 statement()
+                backPatch(addressCounter)
                 implicationPrime()
                 if legalTokens[0][1] == "endif":
                     legalTokens = legalTokens[1:]
                     if legalTokens[0][1] == ';':
-                        outFile.write(f"\nLexeme - {legalTokens[0][1]}, Line - {legalTokens[0][2]}:\n\t <If> ::=     if  ( <Condition>  ) <Statement><If ’> endif;")
+                        gen_inst("LABEL", "NIL")
                         legalTokens = legalTokens[1:]
+                        stateListPrime()
                     else:
-                        outFile.write(f"\nGot: Lexeme - {legalTokens[0][1]}, Line - {legalTokens[0][2]}:\n\t, Expected ;")
+                        raise Exception(f"\nGot: Lexeme - {legalTokens[0][1]}, Line - {legalTokens[0][2]}:\n\t, Expected ;")
                 else:
-                    outFile.write(f"\nGot: Lexeme - {legalTokens[0][1]}, Line - {legalTokens[0][2]}:\n\t, Expected [endif]")
+                    raise Exception(f"\nGot: Lexeme - {legalTokens[0][1]}, Line - {legalTokens[0][2]}:\n\t, Expected [endif]")
             else:
-                outFile.write(f"\nGot: Lexeme - {legalTokens[0][1]}, Line - {legalTokens[0][2]}:\n\t, Expected )")
+                raise Exception(f"\nGot: Lexeme - {legalTokens[0][1]}, Line - {legalTokens[0][2]}:\n\t, Expected )")
         else:
-            outFile.write(f"\nGot: Lexeme - {legalTokens[0][1]}, Line - {legalTokens[0][2]}:\n\t, Expected (")
+            raise Exception(f"\nGot: Lexeme - {legalTokens[0][1]}, Line - {legalTokens[0][2]}:\n\t, Expected (")
     else:
-        outFile.write(f"\nGot: Lexeme - {legalTokens[0][1]}, Line - {legalTokens[0][2]}:\n\t, Expected [if]")
+        raise Exception(f"\nGot: Lexeme - {legalTokens[0][1]}, Line - {legalTokens[0][2]}:\n\t, Expected [if]")
 
 
 def implicationPrime():
     global legalTokens
     if legalTokens[0][1] == "else":
-        outFile.write(f"\nLexeme - {legalTokens[0][1]}, Line - {legalTokens[0][2]}:\n\t <If’> ::= else  <Statement>")
         legalTokens = legalTokens[1:]
         statement()
+        backPatch(addressCounter)
     elif legalTokens[0][1] == "endif":
-        outFile.write(f"\nLexeme - {legalTokens[0][1]}, Line - {legalTokens[0][2]}:\n\t <If’> ::= <Empty>")
         empty()
     else:
-        outFile.write(f"\nGot: Lexeme - {legalTokens[0][1]}, Line - {legalTokens[0][2]}:\n\t, Expected else <statement> or endif")
+        raise Exception(f"\nGot: Lexeme - {legalTokens[0][1]}, Line - {legalTokens[0][2]}:\n\t, Expected else <statement> or endif")
 
 
 def ret():
@@ -560,20 +566,17 @@ def ret():
     if legalTokens[0][1] == "return":
         legalTokens = legalTokens[1:]
         if legalTokens[0][1] != ";":
-            outFile.write(f"\nLexeme - {legalTokens[0][1]}, Line - {legalTokens[0][2]}:\n\t <Return> ::=  return<Return’>")
             retPrime()
         if legalTokens[0][1] == ";":
-            outFile.write(f"\nLexeme - {legalTokens[0][1]}, Line - {legalTokens[0][2]}:\n\t <Return’> ::= <Empty>")
             legalTokens = legalTokens[1:]
             empty()
         else:
-            outFile.write(f"\nGot: Lexeme - {legalTokens[0][1]}, Line - {legalTokens[0][2]}:\n\t, Expected ;")
+            raise Exception(f"\nGot: Lexeme - {legalTokens[0][1]}, Line - {legalTokens[0][2]}:\n\t, Expected ;")
     else:
-        outFile.write(f"\nGot: Lexeme - {legalTokens[0][1]}, Line - {legalTokens[0][2]}:\n\t, Expected <Return>")
+        raise Exception(f"\nGot: Lexeme - {legalTokens[0][1]}, Line - {legalTokens[0][2]}:\n\t, Expected <Return>")
 
 
 def retPrime():
-    outFile.write(f"\nLexeme - {legalTokens[0][1]}, Line - {legalTokens[0][2]}:\n\t <Return’> ::= <Expression>")
     exp()
 
 
@@ -584,72 +587,104 @@ def printPut():
         if legalTokens[0][1] == "(":
             legalTokens = legalTokens[1:]
             exp()
+            gen_inst("STDOUT", "NIL")
             if legalTokens[0][1] == ")":
                 legalTokens = legalTokens[1:]
                 if legalTokens[0][1] == ";":
-                    outFile.write(f"\nLexeme - {legalTokens[0][1]}, Line - {legalTokens[0][2]}:\n\t <Print> ::=	put ( <Expression>);")
                     legalTokens = legalTokens[1:]
                 else:
-                    outFile.write(f"\nGot: Lexeme - {legalTokens[0][1]}, Line - {legalTokens[0][2]}:\n\t, Expected ;")
+                    raise Exception(f"\nGot: Lexeme - {legalTokens[0][1]}, Line - {legalTokens[0][2]}:\n\t, Expected ;")
             else:
-                outFile.write(f"\nGot: Lexeme - {legalTokens[0][1]}, Line - {legalTokens[0][2]}:\n\t, Expected )")
+                raise Exception(f"\nGot: Lexeme - {legalTokens[0][1]}, Line - {legalTokens[0][2]}:\n\t, Expected )")
         else:
-            outFile.write(f"\nGot: Lexeme - {legalTokens[0][1]}, Line - {legalTokens[0][2]}:\n\t, Expected (")
+            raise Exception(f"\nGot: Lexeme - {legalTokens[0][1]}, Line - {legalTokens[0][2]}:\n\t, Expected (")
     else:
-        outFile.write(f"\nGot: Lexeme - {legalTokens[0][1]}, Line - {legalTokens[0][2]}:\n\t, Expected [put]")
+        raise Exception(f"\nGot: Lexeme - {legalTokens[0][1]}, Line - {legalTokens[0][2]}:\n\t, Expected [put]")
 
 
 def scanGet():
     global legalTokens
+    global getStack
+    getStack = []
     if legalTokens[0][1] == "get":
+        gen_inst("STDIN", "NIL")
         legalTokens = legalTokens[1:]
         if legalTokens[0][1] == "(":
             legalTokens = legalTokens[1:]
             ids()
+            for stack in getStack[::-1]:
+                gen_inst("POPM", stack)
             if legalTokens[0][1] == ")":
                 legalTokens = legalTokens[1:]
                 if legalTokens[0][1] == ";":
-                    outFile.write(f"\nLexeme - {legalTokens[0][1]}, Line - {legalTokens[0][2]}:\n\t <Print> ::=	get ( <IDs>);")
                     legalTokens = legalTokens[1:]
                 else:
-                    outFile.write(f"\nGot: Lexeme - {legalTokens[0][1]}, Line - {legalTokens[0][2]}:\n\t, Expected ;")
+                    raise Exception(f"\nGot: Lexeme - {legalTokens[0][1]}, Line - {legalTokens[0][2]}:\n\t, Expected ;")
             else:
-                outFile.write(f"\nGot: Lexeme - {legalTokens[0][1]}, Line - {legalTokens[0][2]}:\n\t, Expected )")
+                raise Exception(f"\nGot: Lexeme - {legalTokens[0][1]}, Line - {legalTokens[0][2]}:\n\t, Expected )")
         else:
-            outFile.write(f"\nGot: Lexeme - {legalTokens[0][1]}, Line - {legalTokens[0][2]}:\n\t, Expected (")
+            raise Exception(f"\nGot: Lexeme - {legalTokens[0][1]}, Line - {legalTokens[0][2]}:\n\t, Expected (")
     else:
-        outFile.write(f"\nGot: Lexeme - {legalTokens[0][1]}, Line - {legalTokens[0][2]}:\n\t, Expected [get]")
+        raise Exception(f"\nGot: Lexeme - {legalTokens[0][1]}, Line - {legalTokens[0][2]}:\n\t, Expected [get]")
 
 def condLoop():
     global legalTokens
     if legalTokens[0][1] == "while":
+        addr = addressCounter
+        gen_inst("LABEL", "NIL")
         legalTokens = legalTokens[1:]
-        outFile.write(f"\nLexeme - {legalTokens[0][1]}, Line - {legalTokens[0][2]}:\n\t <While> ::=  while ( <Condition>  )  <Statement> ")
         if legalTokens[0][1] == "(":
             legalTokens = legalTokens[1:]
             cond()
             if legalTokens[0][1] == ")":
                 legalTokens = legalTokens[1:]
                 statement()
-                outFile.write(f"\nLexeme - {legalTokens[0][1]}, Line - {legalTokens[0][2]}:\n\t <While> ::=  while ( <Condition>  )  <Statement> ")
+                gen_inst("JUMP", addr)
+                backPatch(addressCounter)
             else:
-                outFile.write(f"\nGot: Lexeme - {legalTokens[0][1]}, Line - {legalTokens[0][2]}:\n\t, Expected )")
+                raise Exception(f"\nGot: Lexeme - {legalTokens[0][1]}, Line - {legalTokens[0][2]}:\n\t, Expected )")
         else:
-            outFile.write(f"\nGot: Lexeme - {legalTokens[0][1]}, Line - {legalTokens[0][2]}:\n\t, Expected (")
+            raise Exception(f"\nGot: Lexeme - {legalTokens[0][1]}, Line - {legalTokens[0][2]}:\n\t, Expected (")
     else:
-        outFile.write(f"\nGot: Lexeme - {legalTokens[0][1]}, Line - {legalTokens[0][2]}:\n\t, Expected [While]")
+        raise Exception(f"\nGot: Lexeme - {legalTokens[0][1]}, Line - {legalTokens[0][2]}:\n\t, Expected [While]")
 
 def cond():
     global legalTokens
-    outFile.write(f"\nLexeme - {legalTokens[0][1]}, Line - {legalTokens[0][2]}:\n\t <Condition> ::= 	<Expression>  <Relop>   <Expression>")
+    global relatop
+    global jumpStack
     exp()
     relop()
     exp()
+    if relatop[1] == "==":
+        gen_inst("EQU", "NIL")
+        jumpStack.append(addressCounter)
+        gen_inst("JUMPZ", "NIL")
+    elif relatop[1] == "!=":
+        gen_inst("NEQ", "NIL")
+        jumpStack.append(addressCounter)
+        gen_inst("JUMPZ", "NIL")
+    elif relatop[1] == ">":
+        gen_inst("GRT", "NIL")
+        jumpStack.append(addressCounter)
+        gen_inst("JUMPZ", "NIL")
+    elif relatop[1] == "<":
+        gen_inst("LES", "NIL")
+        jumpStack.append(addressCounter)
+        gen_inst("JUMPZ", "NIL")
+    elif relatop[1] == "<=":
+        gen_inst("LEQ", "NIL")
+        jumpStack.append(addressCounter)
+        gen_inst("JUMPZ", "NIL")
+    elif relatop[1] == "=>":
+        gen_inst("GEQ", "NIL")
+        jumpStack.append(addressCounter)
+        gen_inst("JUMPZ", "NIL")
 
 
 
 def relop():
     global legalTokens
+    global relatop
     if (
         legalTokens[0][1] == "=="
         or legalTokens[0][1] == "!="
@@ -658,115 +693,101 @@ def relop():
         or legalTokens[0][1] == "<="
         or legalTokens[0][1] == "=>"
     ):
-        outFile.write(f"\nLexeme - {legalTokens[0][1]}, Line - {legalTokens[0][2]}:\n\t <Relop> ::=    	==   |   !=	|   > 	|   <	|  <=   |	=>")
+        relatop = legalTokens[0]
         legalTokens = legalTokens[1:]
     else:
-        outFile.write(f"\nGot: Lexeme - {legalTokens[0][1]}, Line - {legalTokens[0][2]}:\n\t, Expected <Relop>")
-
+        raise Exception(f"\nGot: Lexeme - {legalTokens[0][1]}, Line - {legalTokens[0][2]}:\n\t, Expected <Relop>")
 
 def exp():
     global legalTokens
-    outFile.write(f"\nLexeme - {legalTokens[0][1]}, Line - {legalTokens[0][2]}:\n\t <Expression>  ::= <Term><Expression’>")
     term()
     expPrime()
-
 
 def expPrime():
     global legalTokens
     if legalTokens[0][1] == "+":
-        outFile.write(f"\nLexeme - {legalTokens[0][1]}, Line - {legalTokens[0][2]}:\n\t <Expression’> ::= +<Term><Expression’>")
         legalTokens = legalTokens[1:]
         term()
+        gen_inst("ADD", "NIL")
         expPrime()
     elif legalTokens[0][1] == "-":
-        outFile.write(f"\nLexeme - {legalTokens[0][1]}, Line - {legalTokens[0][2]}:\n\t <Expression’> ::= -<Term><Expression’>")
         legalTokens = legalTokens[1:]
         term()
+        gen_inst("SUB", "NIL")
         expPrime()
     else:
-        outFile.write(f"\nLexeme - {legalTokens[0][1]}, Line - {legalTokens[0][2]}:\n\t <Expression’> ::= <Empty>")
         empty()
 
 
 def term():
     global legalTokens
-    outFile.write(f"\nLexeme - {legalTokens[0][1]}, Line - {legalTokens[0][2]}:\n\t <Term>  ::= <Factor><Term’>")
     factor()
     termPrime()
-
 
 def termPrime():
     global legalTokens
     if legalTokens[0][1] == "*":
-        outFile.write(f"\nLexeme - {legalTokens[0][1]}, Line - {legalTokens[0][2]}:\n\t <Term’> ::= *<Factor><Term’>")
         legalTokens = legalTokens[1:]
         factor()
+        gen_inst("MUL", "NIL")
         termPrime()
     elif legalTokens[0][1] == "/":
-        outFile.write(f"\nLexeme - {legalTokens[0][1]}, Line - {legalTokens[0][2]}:\n\t <Term’> ::= /<Factor><Term’>")
         legalTokens = legalTokens[1:]
         factor()
+        gen_inst("DIV", "NIL")
         termPrime()
     else:
-        outFile.write(f"\nLexeme - {legalTokens[0][1]}, Line - {legalTokens[0][2]}:\n\t <Term’> ::= <Empty>")
         empty()
 
 
 def factor():
     global legalTokens
     if legalTokens[0][1] == "-":
-        outFile.write(f"\nLexeme - {legalTokens[0][1]}, Line - {legalTokens[0][2]}:\n\t <Factor> ::= -  <Primary>")
         legalTokens = legalTokens[1:]
-    outFile.write(f"\nLexeme - {legalTokens[0][1]}, Line - {legalTokens[0][2]}:\n\t <Factor> ::= <Primary>")
+    if legalTokens[0][0] == STATE_INT:
+        gen_inst("PUSHI", legalTokens[0][1])
+    else:
+        gen_inst("PUSHM", get_address(legalTokens[0]))
     primary()
 
 
 def primary():
     global legalTokens
     if legalTokens[0][0] == STATE_IDENTIFIER:
-        outFile.write(f"\nLexeme - {legalTokens[0][1]}, Line - {legalTokens[0][2]}:\n\t <Primary> ::=  <Identifier> <Primary’>")
         legalTokens = legalTokens[1:]
         primaryPrime()
     elif legalTokens[0][0] == STATE_INT:
-        outFile.write(f"\nLexeme - {legalTokens[0][1]}, Line - {legalTokens[0][2]}:\n\t <Primary> ::=  <Integer>")
         legalTokens = legalTokens[1:]
     elif legalTokens[0][0] == STATE_REAL:
-        outFile.write(f"\nLexeme - {legalTokens[0][1]}, Line - {legalTokens[0][2]}:\n\t <Primary> ::=  <Integer>")
         legalTokens = legalTokens[1:]
     elif legalTokens[0][1] == "true":
-        outFile.write(f"\nLexeme - {legalTokens[0][1]}, Line - {legalTokens[0][2]}:\n\t <Primary> ::=  true")
         legalTokens = legalTokens[1:]
     elif legalTokens[0][1] == "false":
-        outFile.write(f"\nLexeme - {legalTokens[0][1]}, Line - {legalTokens[0][2]}:\n\t <Primary> ::=  false")
         legalTokens = legalTokens[1:]
     elif legalTokens[0][1] == "(":
-        outFile.write(f"\nLexeme - {legalTokens[0][1]}, Line - {legalTokens[0][2]}:\n\t <Primary> ::=   ( <Expression> ) ")
         legalTokens = legalTokens[1:]
         exp()
         if legalTokens[0][1] == ")":
             legalTokens = legalTokens[1:]
     else:
-        outFile.write(f"\nGot: Lexeme - {legalTokens[0][1]}, Line - {legalTokens[0][2]}:\n\t, Expected <Primary>")
+        raise Exception(f"\nGot: Lexeme - {legalTokens[0][1]}, Line - {legalTokens[0][2]}:\n\t, Expected <Primary>")
 
 
 def primaryPrime():
     global legalTokens
     if legalTokens[0][1] == "(":
-        outFile.write(f"\nLexeme - {legalTokens[0][1]}, Line - {legalTokens[0][2]}:\n\t <Primary’> ::= (<IDs>)")
         legalTokens = legalTokens[1:]
         ids()
         if legalTokens[0][1] == ")":
             legalTokens = legalTokens[1:]
         else:
-            outFile.write(f"\nGot: Lexeme - {legalTokens[0][1]}, Line - {legalTokens[0][2]}:\n\t, Expected )")
+            raise Exception(f"\nGot: Lexeme - {legalTokens[0][1]}, Line - {legalTokens[0][2]}:\n\t, Expected )")
     else:
-        outFile.write(f"\nLexeme - {legalTokens[0][1]}, Line - {legalTokens[0][2]}:\n\t <Primary’> ::= <Empty>")
         empty()
 
 
 def empty():
     global legalTokens
-    outFile.write(f"\nLexeme - {legalTokens[0][1]}, Line - {legalTokens[0][2]}:\n\t <Empty>   ::= <Empty>")
     return None
 
 
@@ -774,18 +795,35 @@ if __name__ == "__main__":
     state = True
     while state:
         source = input("Please enter file name or Return 1 to finish.\n")
+        print()
         if source == "1":
             state = False
             break
         t = getText(source)
         f = removeComments(t)
         global queuedTextpi
-        queuedText = spaceOpsandSeps(f)
         global legalTokens
+        global instructionTable
+        global symbolTable
+        global jumpStack
         global lineCounter
+        global memoryCounter
+        global addressCounter
+        global getStack
+        queuedText = spaceOpsandSeps(f)
+        getStack = []
+        addressCounter = 1
         legalTokens = []
         illegalTokens = []
+        symbolTable = {
+            "ident": [],
+            "mem": [],
+            "type": []
+        }
+        jumpStack = []
+        instructionTable = []
         lineCounter = 1
+        memoryCounter = 5000
         while len(queuedText) > 0:
             t = lexer()
             if t is not None:
@@ -795,8 +833,15 @@ if __name__ == "__main__":
                     legalTokens.append([t[0], t[1], lineCounter])
         if len(illegalTokens) != 0:
             for i in illegalTokens:
-                outFile.write(f"Unrecognized Token: {i[1]}, {i[2]}\n")
+                print(f"Unrecognized Token: {i[1]}, {i[2]}\n")
             break
-        print("\n")
         rat22f()
+        for row in instructionTable:
+            if row[2] != "NIL":
+                print(f"{row[0]}:\t{row[1]}\t{row[2]}")
+                outFile.write(f"{row[1]} {row[2]}\n")
+            else:
+                print(f"{row[0]}:\t{row[1]}")
+                outFile.write(f"{row[1]}\n")
+        print()
         outFile.close()

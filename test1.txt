@@ -1,12 +1,12 @@
-function sub(i integer, j integer){
-	return i - j;
-}
-
 $
-	integer x, y;
-	x = 100;
-	y = 2;
+	integer a, b, c, d, e, f, g, h, i, x, y;
+	boolean z;
+	get(x,y);
 	while (x != 0){
-		x = sub(x,y);
+		x = x - y;
+		if(x > 0){
+			put(x);
+		} endif;
 	}
+	put(x + 1);
 $

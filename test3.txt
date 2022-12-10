@@ -1,58 +1,24 @@
-$	
-	integer x;
-	x = 100;
-	while (x != 0){
-		if (x == 100) 
-		{
-			x = x - 10;
-			put(x);
-		} 
-		else if (x == 90)
-		{
-			x = x - 10;
-			put(x);
-		} 
-		else if (x == 80)
-		{
-			x = x - 10;
-			put(x);
-		} 
-		else if (x == 70)
-		{
-			x = x - 10;
-			put(x);
-		}
-		else if (x == 60)
-		{
-			x = x - 10;
-			put(x);
-		} 
-		else if (x == 50)
-		{
-			x = x - 10;
-			put(x);
-		} 
-		else if (x == 40)
-		{
-			x = x - 10;
-			put(x);
-		} 
-		else if (x == 30)
-		{
-			x = x - 10;
-			put(x);
-		} 
-		else if (x == 20)
-		{
-			x = x - 10;
-			put(x);
-		} 
-		else if (x == 10)
-		{
-			x = x - 10;
-			put(x);
-		}
-		endif; endif; endif; endif; endif; endif; endif; endif; endif; endif;
+$
+	/* some notes */
+	integer a,i,j,x,y,z;
+	i = 0;
+	j = 2;
+	x = 0;
+	y = 1;
+	while(z < 10){
+		if(i < j){
+			i = i + j;
+		} endif;
+		if(x < y){
+			x = j + y;
+		} endif;
+		get(i,j);
+		get(x,y);
+		z = x + i;
+		get(z);
 	}
-		
+	put(z + i);
+	a = i + j;
+	put(a + x);
+	get(a);
 $
